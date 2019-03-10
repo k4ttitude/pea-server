@@ -14,7 +14,12 @@ app.post('/submit', (req, res) => {
     // console.dir(req.body);
     let data = req.body;
     if (data.username && data.answers) {
-        let filePath = `${appRoot}/StudentSolution/${data.username}.dat`;
+        let dataDir = `${appRoot}/StudentSolution`;
+        if (!fs.existsSync(dataDir)) {
+            fs.mkdirSync(dataDir);
+        }
+
+        let filePath = `${dataDir}/${data.username}.dat`;
         console.log(filePath)
         fs.writeFile(filePath, data.answers, (err) => {
             if (err) {

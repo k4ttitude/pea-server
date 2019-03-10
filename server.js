@@ -10,7 +10,7 @@ const fs = require('fs');
 const path = require('path');
 var appRoot = path.resolve(__dirname);
 
-app.get('/index', (req, res) => {
+app.get('/', (req, res) => {
     res.sendFile(`${appRoot}/html/index.html`);
 })
 

@@ -10,6 +10,10 @@ const fs = require('fs');
 const path = require('path');
 var appRoot = path.resolve(__dirname);
 
+app.get('/index', (req, res) => {
+    res.sendFile(`${appRoot}/html/index.html`);
+})
+
 app.post('/submit', (req, res) => {
     // console.dir(req.body);
     let data = req.body;

@@ -37,7 +37,7 @@ app.post('/login', (req, res) => {
 
     // Validate login
     if (!util.validateLogin(data.username, data.hashedPassword)) {
-        res.end('failed');
+        res.end('Login failed');
         return;
     }
     // else.
@@ -55,7 +55,7 @@ app.post('/material', (req, res) => {
     if (data.token && jwt.verify(data.token, keyPair.public, signOptions)) {
         res.status(200).end('verified');
     } else {
-        res.end('verify failed');
+        res.end('Verification failed');
     }
 });
 
@@ -65,7 +65,7 @@ app.post('/submit', (req, res) => {
 
     // Verify token.
     if (!data.token || !jwt.verify(data.token, keyPair.public, signOptions)) {
-        res.end('verify failed');
+        res.end('Verification failed');
         return;
     }
 

@@ -10,9 +10,10 @@ const fs = require('fs');
 const jwt = require('jsonwebtoken');
 const util = require('./util');
 
-// Root Path
+// Paths
 const path = require('path');
 var appRoot = path.resolve(__dirname);
+const materialDir = `${appRoot}/ToStudent/script.sql`;
 
 // JWT
 const secret = 'secret';
@@ -53,11 +54,17 @@ app.post('/material', (req, res) => {
     
     // Verify token.
     if (data.token && jwt.verify(data.token, keyPair.public, signOptions)) {
-        res.status(200).end('verified');
+        // res.status(200).end('Verified');
+        res.status(200).download(materialDir, 'script.sql');
     } else {
         res.end('Verification failed');
     }
 });
+
+// app.get('/material', (req, res) => {
+//     let data = req.body;
+//     res.download(materialDir, 'script.sql');
+// });
 
 // Submit answers.
 app.post('/submit', (req, res) => {
@@ -82,8 +89,8 @@ app.post('/submit', (req, res) => {
                 return console.log(err);
             }
             console.log(`Submit successfully by user ${data.username}`);
+            res.status(200).end('Submitted successfully.');
         });
-        res.end('haha');
     }
 });
 

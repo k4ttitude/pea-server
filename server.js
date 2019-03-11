@@ -5,22 +5,31 @@ const port = 8080;
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: false }));
 
+// 
 const fs = require('fs');
 const jwt = require('jsonwebtoken');
 const util = require('./util');
 
+// Root Path
 const path = require('path');
 var appRoot = path.resolve(__dirname);
 
-app.get('/', (req, res) => {
-    res.sendFile(`${appRoot}/html/index.html`);
-})
-
+// JWT
 const secret = 'secret';
 const signOptions = {
-    algorithm: 'HS256', // HMAC SHA256
+    // algorithm: 'HS256', // HMAC SHA256
+    algorithm: 'RS256',
     expiresIn: '1.5h'
 };
+
+const keyPair = util.getRsaKeyPair(); // RSA privateKey & publicKey
+
+/* ======================================================== */
+
+// Default root.
+app.get('/', (req, res) => {
+    res.sendFile(`${appRoot}/html/index.html`);
+});
 
 // Login, give token.
 app.post('/login', (req, res) => {
@@ -33,9 +42,7 @@ app.post('/login', (req, res) => {
     }
     // else.
     let payload = { username: data.username };
-    let token = jwt.sign(payload, secret, signOptions);
-
-    console.log(token)
+    let token = jwt.sign(payload, keyPair.private, signOptions);
 
     res.status(200).send({ token: token });
 });
@@ -45,7 +52,7 @@ app.post('/material', (req, res) => {
     let data = req.body;
     
     // Verify token.
-    if (data.token && jwt.verify(data.token, secret, signOptions)) {
+    if (data.token && jwt.verify(data.token, keyPair.public, signOptions)) {
         res.status(200).end('verified');
     } else {
         res.end('verify failed');
@@ -57,7 +64,7 @@ app.post('/submit', (req, res) => {
     let data = req.body;
 
     // Verify token.
-    if (!data.token || !jwt.verify(data.token, secret, signOptions)) {
+    if (!data.token || !jwt.verify(data.token, keyPair.public, signOptions)) {
         res.end('verify failed');
         return;
     }

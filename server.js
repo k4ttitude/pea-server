@@ -20,6 +20,9 @@ var appRoot = path.resolve(__dirname);
 const materialDir = `${appRoot}/ToStudent`;
 const materialFilename = 'script.sql';
 
+// Serve css, js
+app.use(express.static(appRoot + '/html')); // dut them
+
 // JWT
 const secret = 'secret';
 const signOptions = {

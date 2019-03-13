@@ -2,6 +2,9 @@
 /StudentSolution
 /ToStudent
 
+# View
+/html
+
 # Logs
 logs
 *.log

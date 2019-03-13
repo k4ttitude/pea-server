@@ -10,17 +10,22 @@ const fs = require('fs');
 const jwt = require('jsonwebtoken');
 const util = require('./util');
 
+/* Exam Info */
+const time = 80; // minutes
+const questionNumber = 10;
+
 // Paths
 const path = require('path');
 var appRoot = path.resolve(__dirname);
-const materialDir = `${appRoot}/ToStudent/script.sql`;
+const materialDir = `${appRoot}/ToStudent`;
+const materialFilename = 'script.sql';
 
 // JWT
 const secret = 'secret';
 const signOptions = {
     // algorithm: 'HS256', // HMAC SHA256
     algorithm: 'RS256',
-    expiresIn: '1.5h'
+    expiresIn: `${time}m`
 };
 
 const keyPair = util.getRsaKeyPair(); // RSA privateKey & publicKey
@@ -44,8 +49,14 @@ app.post('/login', (req, res) => {
     // else.
     let payload = { username: data.username };
     let token = jwt.sign(payload, keyPair.private, signOptions);
+    let expireTime = jwt.decode(token).exp;
 
-    res.status(200).send({ token: token });
+    let responseData = {
+        exp: expireTime,
+        questionNumber: questionNumber,
+        token: token
+    };
+    res.status(200).send(responseData);
 });
 
 // Download given material.
@@ -55,7 +66,8 @@ app.post('/material', (req, res) => {
     // Verify token.
     if (data.token && jwt.verify(data.token, keyPair.public, signOptions)) {
         // res.status(200).end('Verified');
-        res.status(200).download(materialDir, 'script.sql');
+        let filePath = `${materialDir}/${materialFilename}`;
+        res.status(200).download(filePath, data.filename);
     } else {
         res.end('Verification failed');
     }

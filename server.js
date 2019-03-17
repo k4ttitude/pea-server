@@ -114,12 +114,24 @@ app.post('/material', (req, res) => {
 });
 
 // Submit answers.
-app.post('/submit', (req, res) => {
+app.post('/submit', async (req, res) => {
     let data = req.body;
+
+    if (!data.examCode || !data.username || !data.answers) {
+        res.end('Not enough info');
+        return;
+    }
 
     // Verify token.
     if (!data.token || !jwt.verify(data.token, keyPair.public, signOptions) || !data.examCode) {
         res.end('Verification failed');
+        return;
+    }
+
+    // Verify exam code
+    let verified = await exam.verifyExamCode(data.examCode);
+    if (!verified) {
+        res.end('Submit Failed');
         return;
     }
 

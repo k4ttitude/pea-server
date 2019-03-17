@@ -8,6 +8,7 @@
     "express": "^4.16.4",
     "jsonwebtoken": "^8.5.0",
     "keypair": "^1.0.1",
+    "mongodb": "^3.1.13",
     "node-forge": "^0.8.1"
   },
   "devDependencies": {},

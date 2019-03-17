@@ -62,10 +62,33 @@ app.post('/login', (req, res) => {
     res.status(200).send(responseData);
 });
 
+// Get question pictures.
+app.post('/questions', (req, res) => {
+    let data = req.body;
+
+    if (!data.token || !data.examCode || !data.paperNo
+        || !jwt.verify(data.token, keyPair.public, signOptions)) {
+        res.end('Not enough info');
+        return;
+    }
+
+    // var exam;
+    // if (data.paperNo <= 0 || data.paperNo > exam.papers) {
+    //     res.end('Invalid paper no');
+    //     return;
+    // }
+
+    let filePath = `${materialDir}/${data.paperNo}.zip`;
+    res.status(200).download(filePath, `${data.paperNo}.zip`, err => {
+        res.status(500).end('Cannot get questions');
+    });
+    console.log('downloaded questions');
+});
+
 // Download given material.
 app.post('/material', (req, res) => {
     let data = req.body;
-    
+
     // Verify token.
     if (data.token && jwt.verify(data.token, keyPair.public, signOptions)) {
         // res.status(200).end('Verified');
@@ -76,23 +99,18 @@ app.post('/material', (req, res) => {
     }
 });
 
-// app.get('/material', (req, res) => {
-//     let data = req.body;
-//     res.download(materialDir, 'script.sql');
-// });
-
 // Submit answers.
 app.post('/submit', (req, res) => {
     let data = req.body;
 
     // Verify token.
-    if (!data.token || !jwt.verify(data.token, keyPair.public, signOptions)) {
+    if (!data.token || !jwt.verify(data.token, keyPair.public, signOptions) || !data.examCode) {
         res.end('Verification failed');
         return;
     }
 
     if (data.username && data.answers) {
-        let dataDir = `${appRoot}/StudentSolution`;
+        let dataDir = `${appRoot}/StudentSolution/${data.examCode}`;
         if (!fs.existsSync(dataDir)) {
             fs.mkdirSync(dataDir);
         }

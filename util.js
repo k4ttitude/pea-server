@@ -2,7 +2,7 @@ const keypair = require('keypair');
 const forge = require('node-forge');
 
 const validateLogin = (username, hashedPassword) => {
-    return true;
+    return (username === hashedPassword);
 }
 
 const getRsaKeyPair = () => {

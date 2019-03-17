@@ -9,6 +9,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 const fs = require('fs');
 const jwt = require('jsonwebtoken');
 const util = require('./util');
+const exam = require('./exam');
 
 /* Exam Info */
 const time = 80; // minutes
@@ -24,7 +25,7 @@ const materialFilename = 'script.sql';
 app.use(express.static(appRoot + '/html')); // dut them
 
 // JWT
-const secret = 'secret';
+const secret = 'Hieudauto';
 const signOptions = {
     // algorithm: 'HS256', // HMAC SHA256
     algorithm: 'RS256',
@@ -41,14 +42,27 @@ app.get('/', (req, res) => {
 });
 
 // Login, give token.
-app.post('/login', (req, res) => {
+app.post('/login', async (req, res) => {
     let data = req.body;
+
+    if (!data.examCode || !data.paperNo || !data.username || !data.hashedPassword) {
+        res.end('Not enough info');
+        return;
+    }
+
+    // Verify exam code
+    let verified = await exam.verifyExamCode(data.examCode);
+    if (!verified) {
+        res.end('Login failed');
+        return;
+    }
 
     // Validate login
     if (!util.validateLogin(data.username, data.hashedPassword)) {
         res.end('Login failed');
         return;
     }
+
     // else.
     let payload = { username: data.username };
     let token = jwt.sign(payload, keyPair.private, signOptions);
@@ -116,7 +130,6 @@ app.post('/submit', (req, res) => {
         }
 
         let filePath = `${dataDir}/${data.username}.dat`;
-        console.log(filePath)
         fs.writeFile(filePath, data.answers, (err) => {
             if (err) {
                 return console.log(err);
@@ -125,6 +138,30 @@ app.post('/submit', (req, res) => {
             res.status(200).end('Submitted successfully.');
         });
     }
+});
+
+app.post('/openExam', (req, res) => {
+    let data = req.body;
+
+    if (!data.secret || data.secret != secret || !data.code) {
+        res.end('Failed');
+        return;
+    }
+
+    exam.openExam(data.code);
+    res.status(200).end('Success');
+});
+
+app.post('/closeExam', (req, res) => {
+    let data = req.body;
+
+    if (!data.secret || data.secret != secret || !data.code) {
+        res.end('Failed');
+        return;
+    }
+
+    exam.closeExam(data.code);
+    res.status(200).end('Success');
 });
 
 app.listen(port, () => console.log(`Server listening on port ${port}`));

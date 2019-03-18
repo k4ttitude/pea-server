@@ -19,7 +19,7 @@ const questionNumber = 10;
 const path = require('path');
 var appRoot = path.resolve(__dirname);
 const materialDir = `${appRoot}/ToStudent`;
-const materialFilename = 'script.sql';
+const materialFilename = 'script.zip';
 
 // Serve css, js
 app.use(express.static(appRoot + '/html')); // dut them

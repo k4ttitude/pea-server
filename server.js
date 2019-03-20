@@ -152,6 +152,18 @@ app.post('/submit', async (req, res) => {
     }
 });
 
+app.post('/addExam', async (req, res) => {
+    let data = req.body;
+
+    if (!data.secret || data.secret != secret || !data.code) {
+        res.end('Failed');
+        return;
+    }
+
+    await exam.addExam(data.code);
+    res.status(200).end('Success');
+})
+
 app.post('/openExam', (req, res) => {
     let data = req.body;
 

@@ -53,7 +53,7 @@ const addExam = async (code) => {
     }
 }
 
-const openExam = async (code, handleError = err => {}) => {
+const openExam = async (code) => {
     let _client, db;
 
     _client = await MongoClient.connect(url, { useNewUrlParser: true });

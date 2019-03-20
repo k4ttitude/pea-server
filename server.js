@@ -164,7 +164,7 @@ app.post('/addExam', async (req, res) => {
     res.status(200).end('Success');
 })
 
-app.post('/openExam', async (req, res) => {
+app.post('/openExam', (req, res) => {
     let data = req.body;
 
     if (!data.secret || data.secret != secret || !data.code) {
@@ -172,10 +172,7 @@ app.post('/openExam', async (req, res) => {
         return;
     }
 
-    await exam.openExam(data.code, err => {
-        res.status(500).end('Error');
-        return;
-    });
+    exam.openExam(data.code);
     res.status(200).end('Success');
 });
 

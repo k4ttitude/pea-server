@@ -53,7 +53,7 @@ const addExam = async (code) => {
     }
 }
 
-const openExam = async code => {
+const openExam = async (code, handleError = err => {}) => {
     let _client, db;
 
     _client = await MongoClient.connect(url, { useNewUrlParser: true });
@@ -63,7 +63,8 @@ const openExam = async code => {
         await db.collection('exam').updateOne(exam, {$set: { online: true }}, (err, r) => {
             if (err) {
                 // return false;
-                console.log(err);
+                // console.log(err);
+                handleError(err);
             }
         });
     } finally {
